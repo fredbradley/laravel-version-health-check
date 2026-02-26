@@ -1,0 +1,22 @@
+{
+  "name": "fredbradley/laravel-version-health-check",
+  "type": "package",
+  "description": "A Spatie Laravel Health Check, that checks your Laravel Application version against the latest version release",
+  "require": {
+    "php": "^8.3",
+    "spatie/laravel-health": "^1.37"
+  },
+  "autoload": {
+    "psr-4": {
+      "FredBradley\\LaravelVersionHealthCheck\\": "src/"
+    },
+    "extra": {
+      "laravel": {
+        "providers": [
+          "FredBradley\\LaravelVersionHealthCheck\\ServiceProvider"
+        ]
+      }
+    }
+  }
+}
+
