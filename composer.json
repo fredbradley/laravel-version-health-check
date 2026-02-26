@@ -1,6 +1,23 @@
 {
   "name": "fredbradley/laravel-version-health-check",
-  "type": "package",
+  "type": "library",
+  "license": "MIT",
+  "authors": {
+    "name": "Fred Bradley",
+    "email": "code@fredbradley.co.uk",
+    "role": "Developer"
+  },
+  "keywords": [
+    "laravel",
+    "health",
+    "health-check",
+    "spatie health",
+    "spatie",
+    "health check"
+  ],
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "homepage": "https://github.com/fredbradley/laravel-version-health-check",
   "description": "A Spatie Laravel Health Check, that checks your Laravel Application version against the latest version release",
   "require": {
     "php": "^8.3",
