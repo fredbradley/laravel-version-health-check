@@ -57,6 +57,6 @@ class LaravelVersionHealthCheck extends Check
             return $result->ok();
         }
 
-        return $result->warning('Not the latest Laravel version');
+        return $result->warning('Running '.$envData['environment']['laravel_version']);
     }
 }
