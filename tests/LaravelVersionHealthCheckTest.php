@@ -25,7 +25,7 @@ it('returns a warning when the app is behind the latest Laravel version', functi
     $result = LaravelVersionHealthCheck::new()->run();
 
     expect($result->status->value)->toBe('warning')
-        ->and($result->notificationMessage)->toBe('Not the latest Laravel version');
+        ->and($result->notificationMessage)->toBe('Running '.app()->version());
 });
 
 it('strips the leading v prefix from the GitHub release tag before comparing', function () {
