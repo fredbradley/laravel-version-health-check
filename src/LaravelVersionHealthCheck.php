@@ -28,7 +28,7 @@ class LaravelVersionHealthCheck extends Check
             $response = Http::baseUrl('https://endoflife.date/api/v1/products/')
                 ->get('laravel');
 
-            return $response->successful() ? $response->json() : null;
+            return $response->successful() ? $response->json('result') : null;
         });
 
         if (!is_array($data) || !isset($data['releases'])) {
