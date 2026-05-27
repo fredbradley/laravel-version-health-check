@@ -44,7 +44,7 @@ class LaravelVersionHealthCheck extends Check
         return Carbon::createFromFormat('Y-m-d', $release['eoasFrom']);
     }
 
-    private function getEnvironmentData(): ?array
+    protected function getEnvironmentData(): ?array
     {
         Artisan::call('about', [
             '--only' => 'Environment',

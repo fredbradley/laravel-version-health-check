@@ -29,8 +29,10 @@ it('returns a warning when the app is behind the latest Laravel version', functi
     Http::fake([
         'api.github.com/*' => Http::response(['name' => 'v99.0.0']),
         'endoflife.date/*' => Http::response([
-            'releases' => [
-                ['name' => $currentMajor, 'eoasFrom' => '2099-01-01'],
+            'result' => [
+                'releases' => [
+                    ['name' => $currentMajor, 'eoasFrom' => '2099-01-01'],
+                ],
             ],
         ]),
     ]);
@@ -77,8 +79,10 @@ it('returns a warning when the latest major version is different', function () {
     Http::fake([
         'api.github.com/*' => Http::response(['name' => 'v' . $newerMajorVersion]),
         'endoflife.date/*' => Http::response([
-            'releases' => [
-                ['name' => $currentMajor, 'eoasFrom' => '2099-01-01'],
+            'result' => [
+                'releases' => [
+                    ['name' => $currentMajor, 'eoasFrom' => '2099-01-01'],
+                ],
             ],
         ]),
     ]);
@@ -89,7 +93,7 @@ it('returns a warning when the latest major version is different', function () {
         ->and($result->notificationMessage)->toBe('Running '.app()->version());
 });
 
-it('returns a warning with the EOAS date when active support ends within 5 days', function () {
+it('returns failed with the EOAS date when active support ends within 7 days', function () {
     $parts = explode('.', app()->version());
     $currentMajor = (int) $parts[0];
     $parts[0] = $currentMajor + 1;
@@ -99,15 +103,17 @@ it('returns a warning with the EOAS date when active support ends within 5 days'
     Http::fake([
         'api.github.com/*' => Http::response(['name' => 'v' . $newerMajorVersion]),
         'endoflife.date/*' => Http::response([
-            'releases' => [
-                ['name' => $currentMajor, 'eoasFrom' => $endingSoon],
+            'result' => [
+                'releases' => [
+                    ['name' => $currentMajor, 'eoasFrom' => $endingSoon],
+                ],
             ],
         ]),
     ]);
 
     $result = LaravelVersionHealthCheck::new()->run();
 
-    expect($result->status->value)->toBe('warning')
+    expect($result->status->value)->toBe('failed')
         ->and($result->notificationMessage)->toContain('Active support ends');
 });
 
@@ -120,8 +126,10 @@ it('returns failed when active support has already ended', function () {
     Http::fake([
         'api.github.com/*' => Http::response(['name' => 'v' . $newerMajorVersion]),
         'endoflife.date/*' => Http::response([
-            'releases' => [
-                ['name' => $currentMajor, 'eoasFrom' => '2000-01-01'],
+            'result' => [
+                'releases' => [
+                    ['name' => $currentMajor, 'eoasFrom' => '2000-01-01'],
+                ],
             ],
         ]),
     ]);
@@ -156,4 +164,63 @@ it('stores the response under the correct cache key', function () {
     LaravelVersionHealthCheck::new()->run();
 
     expect(Cache::get('laravel-version-latest'))->toBe('v' . $currentVersion);
+});
+
+it('returns a warning when the GitHub API is unavailable', function () {
+    Http::fake([
+        'api.github.com/*' => Http::response(null, 500),
+    ]);
+
+    $result = LaravelVersionHealthCheck::new()->run();
+
+    expect($result->status->value)->toBe('warning')
+        ->and($result->notificationMessage)->toBe('Could not fetch latest Laravel version');
+});
+
+it('returns a warning when environment data cannot be determined', function () {
+    Http::fake([
+        'api.github.com/*' => Http::response(['name' => 'v99.0.0']),
+    ]);
+
+    $check = new class extends LaravelVersionHealthCheck {
+        protected function getEnvironmentData(): ?array
+        {
+            return null;
+        }
+    };
+
+    $result = $check->run();
+
+    expect($result->status->value)->toBe('warning')
+        ->and($result->notificationMessage)->toBe('Could not determine current Laravel version');
+});
+
+it('returns a warning with unknown support status when the endoflife API is unavailable', function () {
+    $parts = explode('.', app()->version());
+    $parts[0] = (int) $parts[0] + 1;
+
+    Http::fake([
+        'api.github.com/*' => Http::response(['name' => 'v' . implode('.', $parts)]),
+        'endoflife.date/*' => Http::response(null, 500),
+    ]);
+
+    $result = LaravelVersionHealthCheck::new()->run();
+
+    expect($result->status->value)->toBe('warning')
+        ->and($result->notificationMessage)->toBe('Running ' . app()->version() . ' (support status unknown)');
+});
+
+it('returns a warning with unknown support status when the current version is absent from endoflife data', function () {
+    $parts = explode('.', app()->version());
+    $parts[0] = (int) $parts[0] + 1;
+
+    Http::fake([
+        'api.github.com/*' => Http::response(['name' => 'v' . implode('.', $parts)]),
+        'endoflife.date/*' => Http::response(['result' => ['releases' => []]]),
+    ]);
+
+    $result = LaravelVersionHealthCheck::new()->run();
+
+    expect($result->status->value)->toBe('warning')
+        ->and($result->notificationMessage)->toBe('Running ' . app()->version() . ' (support status unknown)');
 });
