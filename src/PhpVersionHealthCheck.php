@@ -41,7 +41,7 @@ class PhpVersionHealthCheck extends Check
         $latestRelease = $releases[0];
 
         if (($latestRelease['latest']['name'] ?? null) === $currentVersion) {
-            $result->shortSummary('Up to date');
+            $result->shortSummary($currentCycle);
 
             return $result->ok();
         }
