@@ -20,7 +20,7 @@
   "minimum-stability": "dev",
   "prefer-stable": true,
   "homepage": "https://github.com/fredbradley/laravel-version-health-check",
-  "description": "A Spatie Laravel Health Check, that checks your Laravel Application version against the latest version release",
+  "description": "Spatie Laravel Health Checks that check your Laravel Application's and PHP's version against the latest version release",
   "require": {
     "php": "^8.3",
     "illuminate/support": "^10.0|^11.0|^12.0|^13.0",

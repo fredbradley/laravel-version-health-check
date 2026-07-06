@@ -1,6 +1,6 @@
 # fredbradley/laravel-version-health-check
 
-A Spatie Laravel Health Check that checks your Laravel Application version against the latest version release.
+Spatie Laravel Health Checks that check your Laravel Application's and PHP's version against the latest available release.
 
 ## Instructions
 
@@ -11,7 +11,7 @@ Then install this package:
 composer require fredbradley/laravel-version-health-check
 ```
 
-The check is called "**Laravel Version**". If you have a health check already using that name, you will have a conflict. Otherwise, it works out of the bag.
+This registers two checks, "**Laravel Version**" and "**PHP Version**". If you have health checks already using those names, you will have a conflict. Otherwise, it works out of the bag.
 
 As per the other Spatie Laravel Health documentation.
 
